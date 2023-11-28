@@ -582,7 +582,12 @@ func (s *StateDB) HasSuicided(addr common.Address) bool {
 func (s *StateDB) AddBalance(addr common.Address, amount *big.Int) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
+		if EnableStateDump {
+			log.Info("AddBalance", "addr", addr, "curBalance", stateObject.Balance(), "amount", amount)
+		}
 		stateObject.AddBalance(amount)
+	} else if EnableStateDump {
+		log.Info("AddBalance_NotFound", "addr", addr, "amount", amount)
 	}
 }
 
@@ -590,14 +595,24 @@ func (s *StateDB) AddBalance(addr common.Address, amount *big.Int) {
 func (s *StateDB) SubBalance(addr common.Address, amount *big.Int) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
+		if EnableStateDump {
+			log.Info("SubBalance", "addr", addr, "curBalance", stateObject.Balance(), "amount", amount)
+		}
 		stateObject.SubBalance(amount)
+	} else if EnableStateDump {
+		log.Info("SubBalance_NotFound", "addr", addr, "amount", amount)
 	}
 }
 
 func (s *StateDB) SetBalance(addr common.Address, amount *big.Int) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
+		if EnableStateDump {
+			log.Info("SetBalance", "addr", addr, "curBalance", stateObject.Balance(), "amount", amount)
+		}
 		stateObject.SetBalance(amount)
+	} else if EnableStateDump {
+		log.Info("SetBalance_NotFound", "addr", addr, "amount", amount)
 	}
 }
 
@@ -615,20 +630,15 @@ func (s *StateDB) SetCode(addr common.Address, code []byte) {
 	}
 }
 
-var (
-	// genesis contracts
-	RelayerHubContract_ = common.HexToAddress("0x0000000000000000000000000000000000001006")
-)
-
 func (s *StateDB) SetState(addr common.Address, key, value common.Hash) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
-		if addr == RelayerHubContract_ {
-			log.Info("SetState RelayerHubContract", "addr", addr, "key", key, "val", value)
+		if EnableStateDump {
+			log.Info("SetState", "addr", addr, "key", key, "val", value)
 		}
 		stateObject.SetState(s.db, key, value)
-	} else if addr == RelayerHubContract_ {
-		log.Info("SetState RelayerHubContract_NotFound", "addr", addr, "key", key, "val", value)
+	} else if EnableStateDump {
+		log.Info("SetState_NotFound", "addr", addr, "key", key)
 	}
 }
 
@@ -649,7 +659,12 @@ func (s *StateDB) SetStorage(addr common.Address, storage map[common.Hash]common
 func (s *StateDB) Suicide(addr common.Address) bool {
 	stateObject := s.getStateObject(addr)
 	if stateObject == nil {
+		if EnableStateDump {
+			log.Info("Suicide_NotFound", "addr", addr)
+		}
 		return false
+	} else if EnableStateDump {
+		log.Info("Suicide", "addr", addr)
 	}
 	s.journal.append(suicideChange{
 		account:     &addr,

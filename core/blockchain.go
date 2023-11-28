@@ -1992,6 +1992,13 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals, setHead bool)
 				return it.index, err
 			}
 		}
+		// bad block: 33851236
+		var stopBlock uint64 = 33801000
+		if block.NumberU64() == stopBlock {
+			log.Info("stopBlock hit", "block number:", stopBlock)
+			return it.index, fmt.Errorf("stopBlock for debug")
+		}
+
 		bc.cacheReceipts(block.Hash(), receipts)
 		bc.cacheBlock(block.Hash(), block)
 		proctime := time.Since(start)

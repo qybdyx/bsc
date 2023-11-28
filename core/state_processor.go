@@ -387,7 +387,7 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 		gp          = new(GasPool).AddGas(block.GasLimit())
 	)
 
-	if header.Number.Uint64() == 33660000 {
+	if header.Number.Uint64() == 33690000 {
 		log.Info("StateProcessor Process", "Number", header.Number)
 		vm.EnableOpcodeDump = true
 		state.EnableStateDump = true
