@@ -30,6 +30,7 @@ var EVMInterpreterPool = sync.Pool{
 		return &EVMInterpreter{}
 	},
 }
+var EnableOpcodeDump bool = false
 
 // Config are the configuration options for the Interpreter
 type Config struct {
@@ -201,6 +202,7 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		op = contract.GetOp(pc)
 		operation := in.cfg.JumpTable[op]
 		cost = operation.constantGas // For tracing
+
 		// Validate stack
 		if sLen := stack.len(); sLen < operation.minStack {
 			return nil, &ErrStackUnderflow{stackLen: sLen, required: operation.minStack}
@@ -239,6 +241,13 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 			}
 			if memorySize > 0 {
 				mem.Resize(memorySize)
+			}
+			if EnableOpcodeDump {
+				log.Info("Run", "opcode", op, "name", op.String(), "constantGas", cost, "dynamicCost", dynamicCost)
+			}
+		} else {
+			if EnableOpcodeDump {
+				log.Info("Run", "opcode", op, "name", op.String(), "constantGas", cost, "dynamicCost", 0)
 			}
 		}
 		if in.cfg.Debug {

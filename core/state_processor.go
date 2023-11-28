@@ -387,6 +387,14 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 		gp          = new(GasPool).AddGas(block.GasLimit())
 	)
 
+	if header.Number.Uint64() == 33660000 {
+		log.Info("StateProcessor Process", "Number", header.Number)
+		vm.EnableOpcodeDump = true
+		state.EnableStateDump = true
+	} else {
+		vm.EnableOpcodeDump = false
+		state.EnableStateDump = false
+	}
 	var receipts = make([]*types.Receipt, 0)
 	// Mutate the block and state according to any hard-fork specs
 	if p.config.DAOForkSupport && p.config.DAOForkBlock != nil && p.config.DAOForkBlock.Cmp(block.Number()) == 0 {

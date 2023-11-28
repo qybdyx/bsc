@@ -50,7 +50,8 @@ var (
 	// emptyRoot is the known root hash of an empty trie.
 	emptyRoot = common.HexToHash("56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
 
-	emptyAddr = crypto.Keccak256Hash(common.Address{}.Bytes())
+	emptyAddr            = crypto.Keccak256Hash(common.Address{}.Bytes())
+	EnableStateDump bool = false
 )
 
 type proofList [][]byte
@@ -430,7 +431,15 @@ func (s *StateDB) Empty(addr common.Address) bool {
 func (s *StateDB) GetBalance(addr common.Address) *big.Int {
 	stateObject := s.getStateObject(addr)
 	if stateObject != nil {
-		return stateObject.Balance()
+		bal := stateObject.Balance()
+		if EnableStateDump {
+			log.Info("GetBalance", "addr", addr, "Balance", bal)
+		}
+		return bal
+
+	}
+	if EnableStateDump {
+		log.Info("GetBalance_NotFound", "addr", addr)
 	}
 	return common.Big0
 }
@@ -452,8 +461,16 @@ func (s *StateDB) TxIndex() int {
 func (s *StateDB) GetCode(addr common.Address) []byte {
 	stateObject := s.getStateObject(addr)
 	if stateObject != nil {
-		return stateObject.Code(s.db)
+		code := stateObject.Code(s.db)
+		if EnableStateDump {
+			log.Info("GetCode", "addr", addr, "len(code)", len(code))
+		}
+		return code
 	}
+	if EnableStateDump {
+		log.Info("GetCode_NotFound", "addr", addr)
+	}
+
 	return nil
 }
 
@@ -485,7 +502,14 @@ func (s *StateDB) GetCodeHash(addr common.Address) common.Hash {
 func (s *StateDB) GetState(addr common.Address, hash common.Hash) common.Hash {
 	stateObject := s.getStateObject(addr)
 	if stateObject != nil {
-		return stateObject.GetState(s.db, hash)
+		val := stateObject.GetState(s.db, hash)
+		if EnableStateDump {
+			log.Info("GetState", "addr", addr, "key", hash, "val", val)
+		}
+		return val
+	}
+	if EnableStateDump {
+		log.Info("GetState_NotFound", "addr", addr, "key", hash)
 	}
 	return common.Hash{}
 }
@@ -591,10 +615,20 @@ func (s *StateDB) SetCode(addr common.Address, code []byte) {
 	}
 }
 
+var (
+	// genesis contracts
+	RelayerHubContract_ = common.HexToAddress("0x0000000000000000000000000000000000001006")
+)
+
 func (s *StateDB) SetState(addr common.Address, key, value common.Hash) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
+		if addr == RelayerHubContract_ {
+			log.Info("SetState RelayerHubContract", "addr", addr, "key", key, "val", value)
+		}
 		stateObject.SetState(s.db, key, value)
+	} else if addr == RelayerHubContract_ {
+		log.Info("SetState RelayerHubContract_NotFound", "addr", addr, "key", key, "val", value)
 	}
 }
 

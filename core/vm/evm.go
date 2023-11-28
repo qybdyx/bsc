@@ -24,7 +24,9 @@ import (
 	"github.com/holiman/uint256"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/systemcontracts"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 )
 
@@ -240,6 +242,13 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		// Initialise a new contract and set the code that is to be used by the EVM.
 		// The contract is a scoped environment for this execution context only.
 		code := evm.StateDB.GetCode(addr)
+		if addr == common.HexToAddress(systemcontracts.LightClientContract) {
+			log.Info("LightClientContract", "len(code)", len(code))
+		}
+		if addr == common.HexToAddress(systemcontracts.CrossChainContract) {
+			log.Info("CrossChainContract", "len(code)", len(code))
+		}
+
 		if len(code) == 0 {
 			ret, err = nil, nil // gas is unchanged
 		} else {
