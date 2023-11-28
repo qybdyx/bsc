@@ -466,6 +466,11 @@ func applyTransaction(msg types.Message, config *params.ChainConfig, bc ChainCon
 	}
 	if tx.Hash() == common.HexToHash("0x7eba4edc7c1806d6ee1691d43513838931de5c94f9da56ec865721b402f775b0") {
 		log.Info("bad hash hit", "blockNumber", blockNumber, "txHash", tx.Hash())
+		vm.EnableOpcodeDump = true
+		state.EnableStateDump = true
+	} else {
+		vm.EnableOpcodeDump = false
+		state.EnableStateDump = false
 	}
 	// Create a new context to be used in the EVM environment.
 	txContext := NewEVMTxContext(msg)
