@@ -1993,7 +1993,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals, setHead bool)
 			}
 		}
 		// bad block: 33851236
-		var stopBlock uint64 = 33801000
+		var stopBlock uint64 = 33851236
 		if block.NumberU64() == stopBlock {
 			log.Info("stopBlock hit", "block number:", stopBlock)
 			return it.index, fmt.Errorf("stopBlock for debug")
