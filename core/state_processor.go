@@ -459,13 +459,16 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 	return statedb, receipts, allLogs, *usedGas, nil
 }
 
+// 1st tx: 0x1909a5c9c52be115344d26faf30fff0bd8f8422c67cd01afa7909e666b453604
+// 2nd tx: 0xa6c46ef7f1fd3b398077b2604c40cfa6d1b5ea02d05f8e1a76826a86a4bb9a22
 // bad tx: 0x7eba4edc7c1806d6ee1691d43513838931de5c94f9da56ec865721b402f775b0
 func applyTransaction(msg types.Message, config *params.ChainConfig, bc ChainContext, author *common.Address, gp *GasPool, statedb *state.StateDB, blockNumber *big.Int, blockHash common.Hash, tx *types.Transaction, usedGas *uint64, evm *vm.EVM, receiptProcessors ...ReceiptProcessor) (*types.Receipt, error) {
 	if state.EnableStateDump {
 		log.Info("applyTransaction", "blockNumber", blockNumber, "txHash", tx.Hash())
 	}
 	if tx.Hash() == common.HexToHash("0x7eba4edc7c1806d6ee1691d43513838931de5c94f9da56ec865721b402f775b0") ||
-		tx.Hash() == common.HexToHash("0xa6c46ef7f1fd3b398077b2604c40cfa6d1b5ea02d05f8e1a76826a86a4bb9a22") {
+		tx.Hash() == common.HexToHash("0xa6c46ef7f1fd3b398077b2604c40cfa6d1b5ea02d05f8e1a76826a86a4bb9a22") ||
+		tx.Hash() == common.HexToHash("0x1909a5c9c52be115344d26faf30fff0bd8f8422c67cd01afa7909e666b453604") {
 		log.Info("bad hash hit", "blockNumber", blockNumber, "txHash", tx.Hash())
 		vm.EnableOpcodeDump = true
 		state.EnableStateDump = true

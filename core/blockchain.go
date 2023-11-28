@@ -1946,7 +1946,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals, setHead bool)
 		statedb.StartPrefetcher("chain")
 		interruptCh := make(chan struct{})
 		// For diff sync, it may fallback to full sync, so we still do prefetch
-		if len(block.Transactions()) >= prefetchTxNumber {
+		if len(block.Transactions()) >= prefetchTxNumber && false {
 			// do Prefetch in a separate goroutine to avoid blocking the critical path
 
 			// 1.do state prefetch for snapshot cache
