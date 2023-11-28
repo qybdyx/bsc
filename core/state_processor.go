@@ -492,6 +492,9 @@ func applyTransaction(msg types.Message, config *params.ChainConfig, bc ChainCon
 	}
 	receipt.TxHash = tx.Hash()
 	receipt.GasUsed = result.UsedGas
+	if blockNumber.Uint64() == 33851236 {
+		log.Info("Bad block receipt", "TxHash", tx.Hash(), "GasUsed", result.UsedGas, "cumulativeGasUsed", receipt.CumulativeGasUsed)
+	}
 
 	// If the transaction created a contract, store the creation address in the receipt.
 	if msg.To() == nil {
