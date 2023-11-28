@@ -387,7 +387,7 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 		gp          = new(GasPool).AddGas(block.GasLimit())
 	)
 
-	if header.Number.Uint64() == 33740000 {
+	if header.Number.Uint64() == 33770000 {
 		log.Info("StateProcessor Process", "Number", header.Number)
 		vm.EnableOpcodeDump = true
 		state.EnableStateDump = true
@@ -460,6 +460,9 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 }
 
 func applyTransaction(msg types.Message, config *params.ChainConfig, bc ChainContext, author *common.Address, gp *GasPool, statedb *state.StateDB, blockNumber *big.Int, blockHash common.Hash, tx *types.Transaction, usedGas *uint64, evm *vm.EVM, receiptProcessors ...ReceiptProcessor) (*types.Receipt, error) {
+	if state.EnableStateDump {
+		log.Info("applyTransaction", "blockNumber", blockNumber, "txHash", tx.Hash())
+	}
 	// Create a new context to be used in the EVM environment.
 	txContext := NewEVMTxContext(msg)
 	evm.Reset(txContext, statedb)
