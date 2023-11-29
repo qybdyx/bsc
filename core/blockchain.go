@@ -1946,7 +1946,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals, setHead bool)
 		statedb.StartPrefetcher("chain")
 		interruptCh := make(chan struct{})
 		// For diff sync, it may fallback to full sync, so we still do prefetch
-		if len(block.Transactions()) >= prefetchTxNumber && false {
+		if len(block.Transactions()) >= prefetchTxNumber {
 			// do Prefetch in a separate goroutine to avoid blocking the critical path
 
 			// 1.do state prefetch for snapshot cache
@@ -1970,6 +1970,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals, setHead bool)
 		if err != nil {
 			bc.reportBlock(block, receipts, err)
 			statedb.StopPrefetcher()
+			time.Sleep(30 * time.Second)
 			return it.index, err
 		}
 		// Update the metrics touched during block processing
@@ -1995,8 +1996,8 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals, setHead bool)
 		// bad block: 33851236
 		var stopBlock uint64 = 33851236
 		if block.NumberU64() == stopBlock {
-			log.Info("stopBlock hit sleep 60s", "block number:", stopBlock)
-			time.Sleep(60 * time.Second)
+			log.Info("stopBlock hit sleep 30s", "block number:", stopBlock)
+			time.Sleep(30 * time.Second)
 			return it.index, fmt.Errorf("stopBlock for debug")
 		}
 
