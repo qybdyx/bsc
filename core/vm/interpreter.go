@@ -30,7 +30,6 @@ var EVMInterpreterPool = sync.Pool{
 		return &EVMInterpreter{}
 	},
 }
-var EnableOpcodeDump bool = false
 
 // Config are the configuration options for the Interpreter
 type Config struct {
@@ -242,11 +241,11 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 			if memorySize > 0 {
 				mem.Resize(memorySize)
 			}
-			if EnableOpcodeDump {
+			if in.evm.EnableOpcodeDump {
 				log.Info("Run", "opcode", op, "name", op.String(), "constantGas", cost, "dynamicCost", dynamicCost)
 			}
 		} else {
-			if EnableOpcodeDump {
+			if in.evm.EnableOpcodeDump {
 				log.Info("Run", "opcode", op, "name", op.String(), "constantGas", cost, "dynamicCost", 0)
 			}
 		}

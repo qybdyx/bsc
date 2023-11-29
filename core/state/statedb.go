@@ -50,8 +50,7 @@ var (
 	// emptyRoot is the known root hash of an empty trie.
 	emptyRoot = common.HexToHash("56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
 
-	emptyAddr            = crypto.Keccak256Hash(common.Address{}.Bytes())
-	EnableStateDump bool = false
+	emptyAddr = crypto.Keccak256Hash(common.Address{}.Bytes())
 )
 
 type proofList [][]byte
@@ -143,10 +142,11 @@ type StateDB struct {
 	SnapshotStorageReads time.Duration
 	SnapshotCommits      time.Duration
 
-	AccountUpdated int
-	StorageUpdated int
-	AccountDeleted int
-	StorageDeleted int
+	AccountUpdated  int
+	StorageUpdated  int
+	AccountDeleted  int
+	StorageDeleted  int
+	EnableStateDump bool
 }
 
 // New creates a new state from a given trie.
@@ -432,13 +432,13 @@ func (s *StateDB) GetBalance(addr common.Address) *big.Int {
 	stateObject := s.getStateObject(addr)
 	if stateObject != nil {
 		bal := stateObject.Balance()
-		if EnableStateDump {
+		if s.EnableStateDump {
 			log.Info("GetBalance", "addr", addr, "Balance", bal)
 		}
 		return bal
 
 	}
-	if EnableStateDump {
+	if s.EnableStateDump {
 		log.Info("GetBalance_NotFound", "addr", addr)
 	}
 	return common.Big0
@@ -462,12 +462,12 @@ func (s *StateDB) GetCode(addr common.Address) []byte {
 	stateObject := s.getStateObject(addr)
 	if stateObject != nil {
 		code := stateObject.Code(s.db)
-		if EnableStateDump {
+		if s.EnableStateDump {
 			log.Info("GetCode", "addr", addr, "len(code)", len(code))
 		}
 		return code
 	}
-	if EnableStateDump {
+	if s.EnableStateDump {
 		log.Info("GetCode_NotFound", "addr", addr)
 	}
 
@@ -503,12 +503,12 @@ func (s *StateDB) GetState(addr common.Address, hash common.Hash) common.Hash {
 	stateObject := s.getStateObject(addr)
 	if stateObject != nil {
 		val := stateObject.GetState(s.db, hash)
-		if EnableStateDump {
+		if s.EnableStateDump {
 			log.Info("GetState", "addr", addr, "key", hash, "val", val)
 		}
 		return val
 	}
-	if EnableStateDump {
+	if s.EnableStateDump {
 		log.Info("GetState_NotFound", "addr", addr, "key", hash)
 	}
 	return common.Hash{}
@@ -582,11 +582,11 @@ func (s *StateDB) HasSuicided(addr common.Address) bool {
 func (s *StateDB) AddBalance(addr common.Address, amount *big.Int) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
-		if EnableStateDump {
+		if s.EnableStateDump {
 			log.Info("AddBalance", "addr", addr, "curBalance", stateObject.Balance(), "amount", amount)
 		}
 		stateObject.AddBalance(amount)
-	} else if EnableStateDump {
+	} else if s.EnableStateDump {
 		log.Info("AddBalance_NotFound", "addr", addr, "amount", amount)
 	}
 }
@@ -595,11 +595,11 @@ func (s *StateDB) AddBalance(addr common.Address, amount *big.Int) {
 func (s *StateDB) SubBalance(addr common.Address, amount *big.Int) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
-		if EnableStateDump {
+		if s.EnableStateDump {
 			log.Info("SubBalance", "addr", addr, "curBalance", stateObject.Balance(), "amount", amount)
 		}
 		stateObject.SubBalance(amount)
-	} else if EnableStateDump {
+	} else if s.EnableStateDump {
 		log.Info("SubBalance_NotFound", "addr", addr, "amount", amount)
 	}
 }
@@ -607,11 +607,11 @@ func (s *StateDB) SubBalance(addr common.Address, amount *big.Int) {
 func (s *StateDB) SetBalance(addr common.Address, amount *big.Int) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
-		if EnableStateDump {
+		if s.EnableStateDump {
 			log.Info("SetBalance", "addr", addr, "curBalance", stateObject.Balance(), "amount", amount)
 		}
 		stateObject.SetBalance(amount)
-	} else if EnableStateDump {
+	} else if s.EnableStateDump {
 		log.Info("SetBalance_NotFound", "addr", addr, "amount", amount)
 	}
 }
@@ -633,11 +633,11 @@ func (s *StateDB) SetCode(addr common.Address, code []byte) {
 func (s *StateDB) SetState(addr common.Address, key, value common.Hash) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
-		if EnableStateDump {
+		if s.EnableStateDump {
 			log.Info("SetState", "addr", addr, "key", key, "val", value)
 		}
 		stateObject.SetState(s.db, key, value)
-	} else if EnableStateDump {
+	} else if s.EnableStateDump {
 		log.Info("SetState_NotFound", "addr", addr, "key", key)
 	}
 }
@@ -659,11 +659,11 @@ func (s *StateDB) SetStorage(addr common.Address, storage map[common.Hash]common
 func (s *StateDB) Suicide(addr common.Address) bool {
 	stateObject := s.getStateObject(addr)
 	if stateObject == nil {
-		if EnableStateDump {
+		if s.EnableStateDump {
 			log.Info("Suicide_NotFound", "addr", addr)
 		}
 		return false
-	} else if EnableStateDump {
+	} else if s.EnableStateDump {
 		log.Info("Suicide", "addr", addr)
 	}
 	s.journal.append(suicideChange{

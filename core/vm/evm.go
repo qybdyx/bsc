@@ -139,7 +139,8 @@ type EVM struct {
 	// callGasTemp holds the gas available for the current call. This is needed because the
 	// available gas is calculated in gasCall* according to the 63/64 rule and later
 	// applied in opCall*.
-	callGasTemp uint64
+	callGasTemp      uint64
+	EnableOpcodeDump bool
 }
 
 // NewEVM returns a new EVM. The returned EVM is not thread safe and should

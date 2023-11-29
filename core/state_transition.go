@@ -345,7 +345,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		st.state.SetNonce(msg.From(), st.state.GetNonce(sender.Address())+1)
 		ret, st.gas, vmerr = st.evm.Call(sender, st.to(), st.data, st.gas, st.value)
 	}
-	if vm.EnableOpcodeDump {
+	if st.evm.EnableOpcodeDump {
 		log.Info("after call", "st.gas", st.gas)
 	}
 
@@ -383,7 +383,7 @@ func (st *StateTransition) refundGas(refundQuotient uint64) {
 		refund = st.state.GetRefund()
 	}
 	st.gas += refund
-	if vm.EnableOpcodeDump {
+	if st.evm.EnableOpcodeDump {
 		log.Info("refundGas", "refund", refund, "st.gas", st.gas)
 	}
 	// Return ETH for remaining gas, exchanged at the original rate.
