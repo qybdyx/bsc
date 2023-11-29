@@ -27,6 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/rlp"
 )
@@ -198,6 +199,7 @@ func (s *StateObject) GetState(db Database, key common.Hash) common.Hash {
 	return s.GetCommittedState(db, key)
 }
 
+// var badAddr1 common.Address = common.HexToAddress("0x00000000001f8b68515EfB546542397d3293CCfd")
 func (s *StateObject) getOriginStorage(key common.Hash) (common.Hash, bool) {
 	if value, cached := s.originStorage[key]; cached {
 		return value, true
@@ -208,7 +210,11 @@ func (s *StateObject) getOriginStorage(key common.Hash) (common.Hash, bool) {
 		if !ok {
 			return common.Hash{}, false
 		}
+
 		storage := val.(common.Hash)
+		if s.db.EnableStateDump || s.address == badAddr1 {
+			log.Info("getOriginStorage", "txIndex", s.db.txIndex, "addr", s.address, "key", key, "val", storage, "EnableStateDump", s.db.EnableStateDump)
+		}
 		s.originStorage[key] = storage
 		return storage, true
 	}
