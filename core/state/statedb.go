@@ -630,15 +630,22 @@ func (s *StateDB) SetCode(addr common.Address, code []byte) {
 	}
 }
 
+var badAddr1 common.Address = common.HexToAddress("0x00000000001f8b68515EfB546542397d3293CCfd")
+var badKey1 common.Hash = common.HexToHash("0x0000000000000000000000000000000000000000000000000000000000000001")
+
 func (s *StateDB) SetState(addr common.Address, key, value common.Hash) {
 	stateObject := s.GetOrNewStateObject(addr)
+	dump := false
+	if addr == badAddr1 && key == badKey1 {
+		dump = true
+	}
 	if stateObject != nil {
-		if s.EnableStateDump {
-			log.Info("SetState", "addr", addr, "key", key, "val", value)
+		if s.EnableStateDump || dump {
+			log.Info("SetState", "addr", addr, "key", key, "val", value, "EnableStateDump", s.EnableStateDump)
 		}
 		stateObject.SetState(s.db, key, value)
-	} else if s.EnableStateDump {
-		log.Info("SetState_NotFound", "addr", addr, "key", key)
+	} else if s.EnableStateDump || dump {
+		log.Info("SetState_NotFound", "addr", addr, "key", key, "EnableStateDump", s.EnableStateDump)
 	}
 }
 
