@@ -498,7 +498,7 @@ func (s *StateDB) GetCodeHash(addr common.Address) common.Hash {
 	return common.BytesToHash(stateObject.CodeHash())
 }
 
-var badAddr1 common.Address = common.HexToAddress("0x00000000001f8b68515EfB546542397d3293CCfd")
+var badAddr1 common.Address = common.HexToAddress("0x89791428868131eb109e42340ad01eb8987526b2")
 
 // var badKey1 common.Hash = common.HexToHash("0x0000000000000000000000000000000000000000000000000000000000000001")
 
